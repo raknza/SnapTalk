@@ -4,6 +4,8 @@ import static com.example.snapchat.http.ApiConstants.URL_MY_USER_INFO;
 
 import androidx.annotation.NonNull;
 
+import com.example.snapchat.data.response.LoginResponse;
+import com.example.snapchat.data.response.SignupResponse;
 import com.example.snapchat.http.ApiConstants;
 import com.example.snapchat.provider.RetrofitProvider;
 
@@ -47,7 +49,7 @@ public interface LoginService {
     @NonNull
     @FormUrlEncoded
     @POST(ApiConstants.URL_REGISTRATION)
-    Call<ResponseBody> register(@FieldMap Map<String, String> parameters);
+    Call<SignupResponse> register(@FieldMap Map<String, String> parameters);
 
 
     /**
@@ -61,7 +63,7 @@ public interface LoginService {
     @NonNull
     @FormUrlEncoded
     @POST(ApiConstants.URL_LOGIN)
-    Call<ResponseBody> login(@FieldMap Map<String, String> parameters);
+    Call<LoginResponse> login(@FieldMap Map<String, String> parameters);
 
     /**
      * @return basic profile information for currently authenticated user.

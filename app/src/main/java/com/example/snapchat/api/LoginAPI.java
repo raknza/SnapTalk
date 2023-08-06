@@ -5,8 +5,16 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.example.snapchat.data.response.LoginResponse;
+import com.example.snapchat.data.response.SignupResponse;
 import com.example.snapchat.service.LoginService;
+import com.example.snapchat.utils.HttpStatus;
+import com.example.snapchat.utils.JwtManager;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,19 +40,12 @@ public class LoginAPI {
 
 
     @NonNull
-    public ResponseBody login(Bundle parameters) throws Exception {
+    public LoginResponse login(Bundle parameters) throws IOException, JSONException {
         final Map<String, String> parameterMap = new HashMap<>();
         for (String key : parameters.keySet()) {
             parameterMap.put(key, parameters.getString(key));
         }
-        Response<ResponseBody> response = loginService.login(parameterMap).execute();
-        if (response.isSuccessful()) {
-            Log.d("login", "success!!!" + response.body().string());
-        }
-        else{
-            throw new Exception(response.message());
-        }
-
+        Response<LoginResponse> response = loginService.login(parameterMap).execute();
         return response.body();
     }
 
@@ -54,15 +55,13 @@ public class LoginAPI {
 
 
     @NonNull
-    private void register(Bundle parameters) throws Exception {
+    public SignupResponse signup(Bundle parameters) throws IOException {
         final Map<String, String> parameterMap = new HashMap<>();
         for (String key : parameters.keySet()) {
             parameterMap.put(key, parameters.getString(key));
         }
-        final Response<ResponseBody> response = loginService.register(parameterMap).execute();
-        if (response.isSuccessful()) {
-            Log.d("register", "success!!!");
-        }
+        Response<SignupResponse> response = loginService.register(parameterMap).execute();
+        return response.body();
     }
 
 

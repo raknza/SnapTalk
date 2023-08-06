@@ -15,7 +15,7 @@ public class ApiConstants {
 
     public static final String URL_USER_INFO_UPDATE = "/api/user/{username}";
 
-    public static final String URL_LOGIN = "api/User/login";
+    public static final String URL_LOGIN = "api/user/login";
 
     public static final String URL_REGISTRATION = "/api/user/registration";
 

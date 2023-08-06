@@ -1,23 +1,20 @@
 package com.example.snapchat.task;
 
-
 import android.content.Context;
 import android.os.Bundle;
 
 import com.example.snapchat.api.LoginAPI;
-import com.example.snapchat.data.response.LoginResponse;
+import com.example.snapchat.data.response.SignupResponse;
 import com.example.snapchat.provider.DefaultModule;
-
-import javax.inject.Inject;
 
 import dagger.hilt.android.EntryPointAccessors;
 
-public abstract class LoginTask extends Task<LoginResponse> {
+public abstract class SignupTask extends Task<SignupResponse> {
     private Bundle parameters;
     private LoginAPI loginAPI;
 
 
-    public LoginTask(Context context, Bundle parameters) {
+    public SignupTask(Context context, Bundle parameters) {
         super();
         this.parameters = parameters;
         loginAPI = EntryPointAccessors.fromApplication(
@@ -25,9 +22,9 @@ public abstract class LoginTask extends Task<LoginResponse> {
     }
 
     @Override
-    protected LoginResponse doInBackground(Void... voids) {
+    protected SignupResponse doInBackground(Void... voids) {
         try {
-            return loginAPI.login(parameters);
+            return loginAPI.signup(parameters);
         } catch (Exception e) {
             e.printStackTrace();
             return null;

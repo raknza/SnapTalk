@@ -29,41 +29,17 @@ import dagger.hilt.android.EntryPointAccessors;
  */
 public abstract class Task<T> extends AsyncTask<Void, Void, T> {
 
-    protected final Handler handler = new Handler();
-
     @Nullable
     private WeakReference<TaskProgressCallback> progressCallback;
 
     @Nullable
     private WeakReference<TaskMessageCallback> messageCallback;
 
-    private WeakReference<View> progressView;
-
-    @NonNull
-    protected final WeakReference<Context> context;
 
     private final CallTrigger callTrigger;
 
-    public Task(Context context) {
-        this(context, CallTrigger.LOADING_UNCACHED);
-    }
-
-    @SuppressWarnings("deprecation")
-    public Task(Context context, CallTrigger callTrigger) {
-        this.context = new WeakReference<>(context);
-        if (context instanceof TaskProcessCallback) {
-            setTaskProcessCallback((TaskProcessCallback) context);
-        }
-        this.callTrigger = callTrigger;
-    }
-
-    public void setProgressDialog(@Nullable View progressView) {
-        if (progressView != null) {
-            this.progressView = new WeakReference<>(progressView);
-        }
-        if (progressView != null) {
-            this.progressCallback = null;
-        }
+    public Task() {
+        this.callTrigger = CallTrigger.LOADING_UNCACHED;
     }
 
     public void setTaskProcessCallback(@Nullable TaskProcessCallback callback) {
@@ -76,7 +52,6 @@ public abstract class Task<T> extends AsyncTask<Void, Void, T> {
             progressCallback = null;
         } else {
             progressCallback = new WeakReference<>(callback);
-            progressView = null;
         }
     }
 
@@ -96,15 +71,11 @@ public abstract class Task<T> extends AsyncTask<Void, Void, T> {
 
     @Override
     protected void onPreExecute() {
-        if (progressView != null) {
-            progressView.get().setVisibility(View.VISIBLE);
-        }
         final TaskProgressCallback callback = getProgressCallback();
         if (callback != null) {
             callback.startProcess();
         }
     }
-
 
     @Override
     protected void onCancelled(T unused) {
@@ -112,16 +83,11 @@ public abstract class Task<T> extends AsyncTask<Void, Void, T> {
         this.onCancelled();
     }
 
-    protected void stopProgress() {
-        if (progressView != null) {
-            progressView.get().setVisibility(View.GONE);
-            progressView.get().setAnimation(null);
-        }
-        final TaskProgressCallback callback = getProgressCallback();
-        if (callback != null) {
-            callback.finishProcess();
-        }
+    @Override
+    protected void onPostExecute(T unused) {
+        super.onPostExecute(unused);
     }
+
 
     /**
      * @return The {@link MessageType} based on the {@link #callTrigger}.
