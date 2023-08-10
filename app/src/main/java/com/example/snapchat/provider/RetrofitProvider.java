@@ -53,7 +53,7 @@ public interface RetrofitProvider {
 
         @NonNull
         private String getBaseUrl() {
-            return "https://10.0.2.2:5001/";
+            return "https://192.168.1.159:5001/";
         }
     }
 }

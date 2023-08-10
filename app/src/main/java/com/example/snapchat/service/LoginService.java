@@ -1,9 +1,12 @@
 package com.example.snapchat.service;
 
-import static com.example.snapchat.http.ApiConstants.URL_MY_USER_INFO;
+import static com.example.snapchat.http.ApiConstants.URL_CHECK_AUTH;
+import static com.example.snapchat.http.ApiConstants.URL_USER_INFO;
 
 import androidx.annotation.NonNull;
 
+import com.example.snapchat.data.model.User;
+import com.example.snapchat.data.response.AuthResponse;
 import com.example.snapchat.data.response.LoginResponse;
 import com.example.snapchat.data.response.SignupResponse;
 import com.example.snapchat.http.ApiConstants;
@@ -16,7 +19,6 @@ import dagger.Module;
 import dagger.Provides;
 import dagger.hilt.InstallIn;
 import dagger.hilt.components.SingletonComponent;
-import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.FieldMap;
@@ -69,8 +71,14 @@ public interface LoginService {
      * @return basic profile information for currently authenticated user.
      */
     @NonNull
-    @FormUrlEncoded
-    @GET(URL_MY_USER_INFO)
-    Call<ResponseBody> getProfile(@Path("username") String username);
+    @GET(URL_USER_INFO)
+    Call<User> getUserInfo();
+
+    /**
+     * @return basic profile information for currently authenticated user.
+     */
+    @NonNull
+    @GET(URL_CHECK_AUTH)
+    Call<AuthResponse> checkAuth();
 
 }

@@ -2,6 +2,7 @@ package com.example.snapchat.provider;
 
 import android.content.Context;
 
+import com.example.snapchat.api.ContactAPI;
 import com.example.snapchat.api.LoginAPI;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
@@ -35,6 +36,7 @@ public abstract class DefaultModule {
     @EntryPoint
     public interface ProviderEntryPoint {
         public LoginAPI getLoginAPI();
+        public ContactAPI getContactAPI();
         public OkHttpClientProvider getOkHttpClientProvider();
         public Gson getGSon();
 
@@ -43,9 +45,6 @@ public abstract class DefaultModule {
     @Module
     @InstallIn(SingletonComponent.class)
     public static class ProvideModule {
-
-        Context myContext;
-        public void setContext(Context context){ myContext = context;}
 
         @Singleton
         @Provides
@@ -65,9 +64,6 @@ public abstract class DefaultModule {
             return new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
         }
 
-        @Singleton
-        @Provides
-        Context provideContext() { return myContext; }
     }
 
 }

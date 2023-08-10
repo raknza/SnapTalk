@@ -5,6 +5,8 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.example.snapchat.utils.CustomTrustManager;
+import com.example.snapchat.utils.JwtInterceptor;
+import com.example.snapchat.utils.JwtManager;
 
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -13,7 +15,10 @@ import java.security.cert.X509Certificate;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
@@ -54,14 +59,10 @@ public interface OkHttpClientProvider extends Provider<OkHttpClient> {
                 sslContext.init(null, trustAllCertificates, new java.security.SecureRandom());
                 OkHttpClient.Builder builder = new OkHttpClient.Builder();
                 builder.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCertificates[0]);
-
-                //client = NetworkHelper.getHttpClient(CertificateHelper.certificates);
-                //CustomTrustManager trustManager = new CustomTrustManager(CertificateHelper.certificates);
-                //KeyStore keyStore = CertificateHelper.getKeyStore(this);
-                //SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
-                //sslContext.init(null, new X509TrustManager[]{trustManager}, null);
-                //SSLSocketFactory sslSocketFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
-                //builder.sslSocketFactory(sslSocketFactory, trustManager);
+                SSLContext.setDefault(sslContext);
+                // allow all host
+                builder.hostnameVerifier((hostname, session) -> true);
+                builder.addInterceptor(new JwtInterceptor());
 
                 //builder.sslSocketFactory(RxUtils.createSSLSocketFactory((X509Certificate)CertificateUtil.certificate),new RxUtils.TrustAllManager((X509Certificate) CertificateUtil.certificate)) ;
                 /*List<Interceptor> interceptors = builder.interceptors();
@@ -94,6 +95,7 @@ public interface OkHttpClientProvider extends Provider<OkHttpClient> {
                 builder.authenticator(oauthRefreshTokenAuthenticator);*/
                 client = builder.build();
                 clients[index] = client;
+
             }
             return client;
         }

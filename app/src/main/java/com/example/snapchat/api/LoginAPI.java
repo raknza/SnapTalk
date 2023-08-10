@@ -5,6 +5,8 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.example.snapchat.data.model.User;
+import com.example.snapchat.data.response.AuthResponse;
 import com.example.snapchat.data.response.LoginResponse;
 import com.example.snapchat.data.response.SignupResponse;
 import com.example.snapchat.service.LoginService;
@@ -40,7 +42,7 @@ public class LoginAPI {
 
 
     @NonNull
-    public LoginResponse login(Bundle parameters) throws IOException, JSONException {
+    public LoginResponse login(Bundle parameters) throws IOException {
         final Map<String, String> parameterMap = new HashMap<>();
         for (String key : parameters.keySet()) {
             parameterMap.put(key, parameters.getString(key));
@@ -48,11 +50,6 @@ public class LoginAPI {
         Response<LoginResponse> response = loginService.login(parameterMap).execute();
         return response.body();
     }
-
-
-
-
-
 
     @NonNull
     public SignupResponse signup(Bundle parameters) throws IOException {
@@ -64,6 +61,17 @@ public class LoginAPI {
         return response.body();
     }
 
+    @NonNull
+    public AuthResponse checkAuth() throws IOException {
+        Response<AuthResponse> response = loginService.checkAuth().execute();
+        return response.body();
+    }
+
+    @NonNull
+    public User getInfo() throws IOException {
+        Response<User> response = loginService.getUserInfo().execute();
+        return response.body();
+    }
 
 
 }

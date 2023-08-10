@@ -20,4 +20,11 @@ public class JwtManager {
         SharedPreferences sharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         return sharedPreferences.getString("jwt", null);
     }
+
+    public static void removeJwt(Context context){
+        SharedPreferences sharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.remove("jwt");
+        editor.apply();
+    }
 }

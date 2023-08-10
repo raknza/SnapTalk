@@ -3,13 +3,9 @@ package com.example.snapchat.task;
 
 import android.content.Context;
 import android.os.Bundle;
-
 import com.example.snapchat.api.LoginAPI;
 import com.example.snapchat.data.response.LoginResponse;
 import com.example.snapchat.provider.DefaultModule;
-
-import javax.inject.Inject;
-
 import dagger.hilt.android.EntryPointAccessors;
 
 public abstract class LoginTask extends Task<LoginResponse> {
