@@ -14,6 +14,7 @@ public class ApiConstants {
     public static final String URL_USER_INFO_UPDATE = "/api/user";
     public static final String URL_MY_CONTACTS = "/api/contact/contactlist";
     public static final String URL_CREATE_CONTACT = "/api/contact/create";
+    public static final String URL_DELETE_CONTACT = "/api/contact/delete";
     public static final String URL_LOGIN = "api/user/login";
     public static final String URL_REGISTRATION = "/api/user/registration";
 

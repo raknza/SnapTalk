@@ -45,4 +45,14 @@ public class ContactAPI {
         Response<EmptyResponse> response = contactService.createContact(parameterMap).execute();
         return response.body();
     }
+
+    @NonNull
+    public EmptyResponse deleteContact(Bundle parameters) throws IOException {
+        final Map<String, String> parameterMap = new HashMap<>();
+        for (String key : parameters.keySet()) {
+            parameterMap.put(key, parameters.getString(key));
+        }
+        Response<EmptyResponse> response = contactService.deleteContact(parameterMap).execute();
+        return response.body();
+    }
 }

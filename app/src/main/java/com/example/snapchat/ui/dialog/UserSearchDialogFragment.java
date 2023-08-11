@@ -28,7 +28,7 @@ public class UserSearchDialogFragment extends DialogFragment {
         binding.addContactButton.setOnClickListener(v -> viewModel.addContact(getContext()));
         viewModel.getAddContactSuccess().observe(getViewLifecycleOwner(), success-> {
             if(success == true){
-                contactViewModel.getContactList(getContext());
+                contactViewModel.addContact(viewModel.getCreatedContact());
             }
         });
 

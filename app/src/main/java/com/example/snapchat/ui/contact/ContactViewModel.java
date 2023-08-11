@@ -14,7 +14,9 @@ import androidx.lifecycle.ViewModel;
 import com.example.myapplication.R;
 import com.example.snapchat.adapter.ContactAdapter;
 import com.example.snapchat.data.model.Contact;
+import com.example.snapchat.data.response.EmptyResponse;
 import com.example.snapchat.data.response.LoginResponse;
+import com.example.snapchat.task.DeleteContactTask;
 import com.example.snapchat.task.GetContactTask;
 import com.example.snapchat.task.LoginTask;
 import com.example.snapchat.utils.JwtManager;
@@ -70,6 +72,24 @@ public class ContactViewModel extends ViewModel {
 
     public void openDialog(){
         dialogOpened.setValue(View.VISIBLE);
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    public void deleteContact(Context context){
+        Bundle bundle = new Bundle();
+        bundle.putString("username", onSelectedContact.getValue().username);
+        Contact contactToDelete = onSelectedContact.getValue();
+        DeleteContactTask deleteContactTask = new DeleteContactTask(context,bundle) {
+            @Override
+            protected void onPostExecute(EmptyResponse result){
+                super.onPostExecute(result);
+                if(result != null) {
+                    contactList.remove(contactToDelete);
+                    contactAdapter.getValue().updateData(contactList);
+                }
+            }
+        };
+        deleteContactTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     public void addContact(Contact contact){

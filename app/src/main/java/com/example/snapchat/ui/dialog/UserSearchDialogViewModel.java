@@ -26,15 +26,17 @@ public class UserSearchDialogViewModel extends ViewModel {
     private MutableLiveData<Integer> addButtonVisiblity;
     private MutableLiveData<String> searchResult;
     private MutableLiveData<Boolean> addContactSuccess;
+    private MutableLiveData<Contact> createdContact;
 
     public UserSearchDialogViewModel() {
         contactList = new ArrayList<>();
         contactAdapter = new MutableLiveData<>();
-        this.searchingUsername = new MutableLiveData<>();
+        searchingUsername = new MutableLiveData<>();
         addButtonVisiblity = new MutableLiveData<>();
         contactAdapter.setValue(new ContactAdapter(contactList,this));
         searchResult = new MutableLiveData<>();
         addContactSuccess = new MutableLiveData<>();
+        createdContact = new MutableLiveData<>();
         addButtonVisiblity.setValue(View.INVISIBLE);
     }
 
@@ -44,6 +46,8 @@ public class UserSearchDialogViewModel extends ViewModel {
     public MutableLiveData<Integer> getAddButtonVisiblity() { return addButtonVisiblity; }
     public MutableLiveData<String> getSearchResult()  {return searchResult; }
     public MutableLiveData<Boolean> getAddContactSuccess() { return addContactSuccess; }
+
+    public Contact getCreatedContact() { return createdContact.getValue(); }
     @SuppressLint("StaticFieldLeak")
     public void searchUser(Context context){
         SearchUserTask searchUserTask = new SearchUserTask(context,searchingUsername.getValue()) {
@@ -74,6 +78,7 @@ public class UserSearchDialogViewModel extends ViewModel {
             @Override
             protected void onPostExecute(EmptyResponse result){
                 super.onPostExecute(result);
+                createdContact.setValue(contactList.get(0));
                 contactList.clear();
                 addButtonVisiblity.setValue(View.INVISIBLE);
                 // add contact success

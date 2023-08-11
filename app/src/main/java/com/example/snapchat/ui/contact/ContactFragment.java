@@ -48,9 +48,8 @@ public class ContactFragment extends Fragment {
     }
 
     private void openContactPage(Contact contact) {
-        ContactDialogFragment contactDialogFragment = new ContactDialogFragment(contact);
+        ContactDialogFragment contactDialogFragment = new ContactDialogFragment(contact,contactViewModel);
         contactDialogFragment.setStyle(DialogFragment.STYLE_NORMAL, R.style.CustomDialogStyle);
-
         contactDialogFragment.setOnDismissListener(() -> contactViewModel.closeContactDialog());
         contactDialogFragment.show(getChildFragmentManager(), "contact_dialog");
     }

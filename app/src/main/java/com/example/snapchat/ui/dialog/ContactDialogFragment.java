@@ -11,16 +11,19 @@ import com.bumptech.glide.request.RequestOptions;
 import com.example.myapplication.R;
 import com.example.myapplication.databinding.DialogContactBinding;
 import com.example.snapchat.data.model.Contact;
+import com.example.snapchat.ui.contact.ContactViewModel;
 
 public class ContactDialogFragment extends DialogFragment {
 
     Contact contact;
     DialogContactBinding binding;
     private OnDismissListener dismissListener;
+    ContactViewModel contactViewModel;
 
-    public ContactDialogFragment(Contact contact) {
+    public ContactDialogFragment(Contact contact, ContactViewModel contactViewModel) {
         super();
         this.contact = contact;
+        this.contactViewModel = contactViewModel;
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -32,7 +35,7 @@ public class ContactDialogFragment extends DialogFragment {
                 .apply(RequestOptions.circleCropTransform())
                 .into(binding.avatar);
         binding.executePendingBindings();
-
+        setDeleteContactListener();
         return binding.getRoot();
     }
 
@@ -45,6 +48,13 @@ public class ContactDialogFragment extends DialogFragment {
     }
     public void setOnDismissListener(OnDismissListener listener) {
         this.dismissListener = listener;
+    }
+
+    public void setDeleteContactListener(){
+        binding.deleteButton.setOnClickListener(v -> {
+            contactViewModel.deleteContact(getContext());
+            dismiss();
+        });
     }
 
 }

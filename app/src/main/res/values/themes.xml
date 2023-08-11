@@ -24,7 +24,7 @@
 
     <style name="Theme.MyApplication.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
-    <style name="Theme.MyApplication.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark" />
+    <style name="Theme.MyApplication.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
     <style name="CustomDialogStyle" parent="Theme.AppCompat.Dialog">
         <item name="android:backgroundDimEnabled">true</item>
         <item name="android:backgroundDimAmount">0.25</item>

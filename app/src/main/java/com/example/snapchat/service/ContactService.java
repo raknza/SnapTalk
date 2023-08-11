@@ -44,6 +44,13 @@ public interface ContactService {
     @FormUrlEncoded
     @POST(ApiConstants.URL_CREATE_CONTACT)
     Call<EmptyResponse> createContact(@FieldMap Map<String, String> parameters);
+    /**
+     * Reset password for account associated with an email address.
+     */
+    @NonNull
+    @FormUrlEncoded
+    @POST(ApiConstants.URL_DELETE_CONTACT)
+    Call<EmptyResponse> deleteContact(@FieldMap Map<String, String> parameters);
 
     @NonNull
     @GET(ApiConstants.URL_MY_CONTACTS)
