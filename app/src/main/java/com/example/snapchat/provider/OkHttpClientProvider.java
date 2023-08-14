@@ -39,23 +39,22 @@ public interface OkHttpClientProvider extends Provider<OkHttpClient> {
         }
 
         @NonNull
-        @Override
-        public OkHttpClient get() {
-            try {
-                return get(true, false);
-            } catch (NoSuchAlgorithmException | KeyManagementException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        @NonNull
-        private synchronized OkHttpClient get(boolean isOAuthBased, boolean usesOfflineCache) throws NoSuchAlgorithmException, KeyManagementException {
+        public synchronized OkHttpClient get() {
             final int index = 0;
             OkHttpClient client = clients[index];
             if (client == null) {
                 TrustManager[] trustAllCertificates = new CustomTrustManager[]{ new CustomTrustManager()};
-                SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
-                sslContext.init(null, trustAllCertificates, new java.security.SecureRandom());
+                SSLContext sslContext = null;
+                try {
+                    sslContext = SSLContext.getInstance("TLSv1.2");
+                } catch (NoSuchAlgorithmException e) {
+                    throw new RuntimeException(e);
+                }
+                try {
+                    sslContext.init(null, trustAllCertificates, new java.security.SecureRandom());
+                } catch (KeyManagementException e) {
+                    throw new RuntimeException(e);
+                }
                 OkHttpClient.Builder builder = new OkHttpClient.Builder();
                 builder.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCertificates[0]);
                 SSLContext.setDefault(sslContext);
@@ -63,35 +62,6 @@ public interface OkHttpClientProvider extends Provider<OkHttpClient> {
                 builder.hostnameVerifier((hostname, session) -> true);
                 builder.addInterceptor(new JwtInterceptor());
 
-                //builder.sslSocketFactory(RxUtils.createSSLSocketFactory((X509Certificate)CertificateUtil.certificate),new RxUtils.TrustAllManager((X509Certificate) CertificateUtil.certificate)) ;
-                /*List<Interceptor> interceptors = builder.interceptors();
-                if (usesOfflineCache) {
-                    final File cacheDirectory = new File(context.getFilesDir(), "http-cache");
-                    if (!cacheDirectory.exists()) {
-                        cacheDirectory.mkdirs();
-                    }
-                    final Cache cache = new Cache(cacheDirectory, cacheSize);
-                    builder.cache(cache);
-                    interceptors.add(new StaleIfErrorInterceptor());
-                    interceptors.add(new StaleIfErrorHandlingInterceptor());
-                    builder.networkInterceptors().add(new NoCacheHeaderStrippingInterceptor());
-                }
-                interceptors.add(new UserAgentInterceptor(
-                        System.getProperty("http.agent") + " " +
-                                context.getString(R.string.app_name) + "/" +
-                                BuildConfig.APPLICATION_ID + "/" +
-                                BuildConfig.VERSION_NAME));
-                if (isOAuthBased) {
-                    interceptors.add(new OauthHeaderRequestInterceptor(context));
-                    interceptors.add(oauthRefreshTokenAuthenticator);
-                }
-                interceptors.add(new NewVersionBroadcastInterceptor());
-                if (BuildConfig.DEBUG) {
-                    HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
-                    loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-                    interceptors.add(loggingInterceptor);
-                }
-                builder.authenticator(oauthRefreshTokenAuthenticator);*/
                 client = builder.build();
                 clients[index] = client;
 

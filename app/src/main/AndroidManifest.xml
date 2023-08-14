@@ -45,6 +45,7 @@
             android:name="com.example.snapchat.MainActivity"
             android:windowSoftInputMode="adjustResize"
             android:exported="false"
+            android:launchMode="singleTop"
             android:theme="@style/Theme.MyApplication.NoActionBar"></activity>
     </application>
 

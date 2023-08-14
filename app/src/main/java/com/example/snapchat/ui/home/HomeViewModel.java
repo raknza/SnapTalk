@@ -1,6 +1,8 @@
 package com.example.snapchat.ui.home;
 
+import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.Lifecycle;
@@ -23,15 +25,15 @@ public class HomeViewModel extends ViewModel {
 
     MutableLiveData<ChatroomAdapter> chatroomAdapter;
     List<ChatPartner> chatPartners;
-    private MutableLiveData<ChatPartner> onSelectedCharPartners;
+    private MutableLiveData<ChatPartner> onSelectedChatPartners;
 
     public HomeViewModel() {
         chatroomAdapter = new MutableLiveData<>();
-        onSelectedCharPartners = new MutableLiveData<>();
+        onSelectedChatPartners = new MutableLiveData<>();
     }
 
     public MutableLiveData<ChatroomAdapter> getChatroomAdapter() { return chatroomAdapter; }
-    public MutableLiveData<ChatPartner> getOnSelectedCharPartners() { return onSelectedCharPartners; }
+    public MutableLiveData<ChatPartner> getOnSelectedCharPartners() { return onSelectedChatPartners; }
 
     public void observeChatPartners(LifecycleOwner owner) {
         DataManager.getInstance().getChatPartners().observe(owner, chatPartners -> {
@@ -41,11 +43,20 @@ public class HomeViewModel extends ViewModel {
     }
 
     public void selectChatPartner(int index){
-        onSelectedCharPartners.setValue(chatPartners.get(index));
+        onSelectedChatPartners.setValue(chatPartners.get(index));
+    }
+
+    public void selectChatPartner(String username){
+        for(int i=0;i<chatPartners.size();i++){
+            if(username.equals(chatPartners.get(i).contact.username)){
+                onSelectedChatPartners.setValue(chatPartners.get(i));
+                break;
+            }
+        }
     }
 
     public void closeChatroomDialog(){
-        onSelectedCharPartners.setValue(null);
+        onSelectedChatPartners.setValue(null);
     }
 
 }

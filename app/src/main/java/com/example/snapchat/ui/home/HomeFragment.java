@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
@@ -12,11 +13,15 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.myapplication.R;
 import com.example.myapplication.databinding.FragmentHomeBinding;
+import com.example.snapchat.MainActivity;
 import com.example.snapchat.data.model.ChatPartner;
 import com.example.snapchat.data.model.Contact;
 import com.example.snapchat.ui.chatroom.ChatroomDialogFragment;
 import com.example.snapchat.ui.dialog.ContactDialogFragment;
 import com.example.snapchat.ui.dialog.OnDismissListener;
+import com.example.snapchat.utils.DataManager;
+
+import java.util.List;
 
 public class HomeFragment extends Fragment {
 
@@ -47,6 +52,29 @@ public class HomeFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Bundle args = getArguments();
+        if (args != null && args.containsKey("openChatroom")) {
+            openDialogWithUsername(args.getString("openChatroom"));
+        }
+    }
+
+
+    public void openDialogWithUsername(String username) {
+        List<ChatPartner> partnerList = DataManager.getInstance().getChatPartners().getValue();
+        if(partnerList == null || partnerList.size() == 0){
+            DataManager.getInstance().getChatPartners().observe(getViewLifecycleOwner(), chatPartners ->
+            {
+                viewModel.selectChatPartner(username);
+            });
+        }
+        else {
+            viewModel.selectChatPartner(username);
+        }
     }
 
     private void openChatroom(ChatPartner chatPartner) {

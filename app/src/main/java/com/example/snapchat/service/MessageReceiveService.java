@@ -3,6 +3,7 @@ package com.example.snapchat.service;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +14,7 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import com.example.myapplication.R;
+import com.example.snapchat.MainActivity;
 import com.example.snapchat.data.IMqttCallBack;
 import com.example.snapchat.data.model.Message;
 import com.example.snapchat.provider.DefaultModule;
@@ -61,7 +63,7 @@ public class MessageReceiveService extends Service implements IMqttCallBack {
         DataManager.getInstance().getUserLiveData().observeForever(user-> {
             connect();
         });
-        return START_STICKY;
+        return START_REDELIVER_INTENT;
     }
 
     private void createNotificationChannel() {
@@ -163,6 +165,12 @@ public class MessageReceiveService extends Service implements IMqttCallBack {
             NotificationChannel channel = new NotificationChannel("channel_id", "Channel Name", NotificationManager.IMPORTANCE_DEFAULT);
             notificationManager.createNotificationChannel(channel);
         }
+
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        intent.putExtra("openChatroom", topic.substring(0,topic.indexOf('.')));
+        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        builder.setContentIntent(pendingIntent);
+        builder.setAutoCancel(true);
 
         notificationManager.notify(notificationId, builder.build());
     }
