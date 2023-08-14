@@ -31,7 +31,7 @@ public class ContactDialogFragment extends DialogFragment {
         binding.setContact(contact);
         binding.setLifecycleOwner(this);
         Glide.with(binding.avatar.getContext())
-                .load(R.drawable.avatar_icon)
+                .load(contact.avatar.isEmpty()?R.drawable.avatar_icon:contact.avatar)
                 .apply(RequestOptions.circleCropTransform())
                 .into(binding.avatar);
         binding.executePendingBindings();

@@ -44,7 +44,6 @@ public interface OkHttpClientProvider extends Provider<OkHttpClient> {
             try {
                 return get(true, false);
             } catch (NoSuchAlgorithmException | KeyManagementException e) {
-                Log.e("e",e.toString());
                 throw new RuntimeException(e);
             }
         }

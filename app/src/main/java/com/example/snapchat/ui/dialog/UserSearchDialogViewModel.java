@@ -4,9 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import com.example.myapplication.R;
@@ -33,7 +31,7 @@ public class UserSearchDialogViewModel extends ViewModel {
         contactAdapter = new MutableLiveData<>();
         searchingUsername = new MutableLiveData<>();
         addButtonVisiblity = new MutableLiveData<>();
-        contactAdapter.setValue(new ContactAdapter(contactList,this));
+        contactAdapter.setValue(new ContactAdapter(contactList));
         searchResult = new MutableLiveData<>();
         addContactSuccess = new MutableLiveData<>();
         createdContact = new MutableLiveData<>();

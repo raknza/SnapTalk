@@ -19,6 +19,7 @@ import com.example.snapchat.data.response.LoginResponse;
 import com.example.snapchat.task.DeleteContactTask;
 import com.example.snapchat.task.GetContactTask;
 import com.example.snapchat.task.LoginTask;
+import com.example.snapchat.utils.DataManager;
 import com.example.snapchat.utils.JwtManager;
 
 import java.util.ArrayList;
@@ -26,14 +27,14 @@ import java.util.List;
 
 public class ContactViewModel extends ViewModel {
 
-    private List<Contact> contactList ;
+    private MutableLiveData<List<Contact>> contactList ;
     private MutableLiveData<ContactAdapter> contactAdapter;
     private MutableLiveData<Contact> onSelectedContact;
     private MutableLiveData<Integer> dialogOpened;
     public ContactViewModel() {
-        contactList = new ArrayList<>();
+        contactList = DataManager.getInstance().getContactListLiveData();
         contactAdapter = new MutableLiveData<>();
-        contactAdapter.setValue(new ContactAdapter(contactList,this));
+        contactAdapter.setValue(new ContactAdapter(contactList.getValue(),this));
         onSelectedContact = new MutableLiveData<>();
         dialogOpened = new MutableLiveData<>();
         dialogOpened.setValue(View.INVISIBLE);
@@ -43,26 +44,8 @@ public class ContactViewModel extends ViewModel {
     public MutableLiveData<Contact> getOnSelectedContact() { return onSelectedContact; }
     public MutableLiveData<Integer> getDialogOpened() { return dialogOpened; }
 
-    @SuppressLint("StaticFieldLeak")
-    public void getContactList(Context context){
-        GetContactTask getContactTask = new GetContactTask(context) {
-            @Override
-            protected void onPostExecute(Contact[] result){
-                super.onPostExecute(result);
-                if(result != null) {
-                    contactList.clear();
-                    for(int i=0;i<result.length;i++){
-                        contactList.add(result[i]);
-                    }
-                    contactAdapter.getValue().updateData(contactList);
-                }
-            }
-        };
-        getContactTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-    }
-
     public void selectContact(int index){
-        onSelectedContact.setValue(contactList.get(index));
+        onSelectedContact.setValue(contactList.getValue().get(index));
         openDialog();
     }
     public void closeContactDialog(){
@@ -84,8 +67,8 @@ public class ContactViewModel extends ViewModel {
             protected void onPostExecute(EmptyResponse result){
                 super.onPostExecute(result);
                 if(result != null) {
-                    contactList.remove(contactToDelete);
-                    contactAdapter.getValue().updateData(contactList);
+                    DataManager.getInstance().removeContact(contactToDelete);
+                    contactAdapter.getValue().updateData(contactList.getValue());
                 }
             }
         };
@@ -93,7 +76,7 @@ public class ContactViewModel extends ViewModel {
     }
 
     public void addContact(Contact contact){
-        contactList.add(contact);
-        contactAdapter.getValue().updateData(contactList);
+        DataManager.getInstance().addContact(contact);
+        contactAdapter.getValue().updateData(contactList.getValue());
     }
 }

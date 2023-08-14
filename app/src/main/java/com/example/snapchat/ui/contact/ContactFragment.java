@@ -32,7 +32,6 @@ public class ContactFragment extends Fragment {
 
         binding.searchUserButton.setOnClickListener(v -> openUserSearchPage());
 
-        contactViewModel.getContactList(getContext());
         contactViewModel.getOnSelectedContact().observe(getViewLifecycleOwner(), contact-> {
             if(contact != null)
                 openContactPage(contact);

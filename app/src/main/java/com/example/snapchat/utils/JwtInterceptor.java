@@ -19,7 +19,6 @@ public class JwtInterceptor implements Interceptor {
     @Override
     public Response intercept(Chain chain) throws IOException {
         Request originalRequest = chain.request();
-        Log.e("intercept", "what??" + jwtToken);
         Request.Builder requestBuilder = originalRequest.newBuilder()
                 .header("Authorization", "Bearer " + jwtToken);
 
