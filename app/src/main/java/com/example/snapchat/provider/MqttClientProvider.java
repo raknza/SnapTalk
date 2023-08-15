@@ -41,6 +41,7 @@ public class MqttClientProvider {
         mqttConnectOptions.setUserName("a".trim());
         mqttConnectOptions.setPassword("a".trim().toCharArray());
         mqttConnectOptions.setConnectionTimeout(100);
+        mqttConnectOptions.setAutomaticReconnect(true);
         mCallBack = new MqttCallback() {
             @Override
             public void connectionLost(Throwable cause) {

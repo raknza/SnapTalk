@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
-
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import com.example.myapplication.R;
@@ -23,15 +22,10 @@ import com.example.snapchat.utils.DataManager;
 import com.example.snapchat.data.model.Contact;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
-
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import dagger.hilt.android.EntryPointAccessors;
 
 

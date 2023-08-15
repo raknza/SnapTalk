@@ -3,7 +3,11 @@ package com.example.snapchat.data.model;
 import com.example.snapchat.adapter.CustomDateAdapter;
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 public class Message {
     @SerializedName("id")
@@ -27,6 +31,24 @@ public class Message {
         IMAGE,
         FILE,
         LINK
+    }
+
+    public String getTime() {
+        return convertDateFormat(timestamp);
+    }
+    static String inputFormat = "MMM dd, yyyy HH:mm:ss";
+    static String outputFormat = "HH:mm";
+    public static String convertDateFormat(String inputDate) {
+        try {
+            SimpleDateFormat inputDateFormat = new SimpleDateFormat(inputFormat, Locale.getDefault());
+            Date date = inputDateFormat.parse(inputDate);
+
+            SimpleDateFormat outputDateFormat = new SimpleDateFormat(outputFormat, Locale.getDefault());
+            return outputDateFormat.format(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
 

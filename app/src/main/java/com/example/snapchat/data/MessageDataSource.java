@@ -5,19 +5,11 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-
 import com.example.snapchat.data.model.Message;
 import com.example.snapchat.utils.DataManager;
 import com.example.snapchat.utils.MessageDatabaseHelper;
-
-import android.content.ContentValues;
-import android.content.Context;
-import android.database.Cursor;
 import android.database.SQLException;
-import android.database.sqlite.SQLiteDatabase;
-
 import androidx.lifecycle.MutableLiveData;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
