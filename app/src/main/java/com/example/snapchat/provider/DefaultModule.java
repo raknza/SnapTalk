@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.example.snapchat.api.ContactAPI;
 import com.example.snapchat.api.LoginAPI;
+import com.example.snapchat.api.MessageAPI;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -37,6 +38,7 @@ public abstract class DefaultModule {
     public interface ProviderEntryPoint {
         public LoginAPI getLoginAPI();
         public ContactAPI getContactAPI();
+        public MessageAPI getMessagePI();
         public OkHttpClientProvider getOkHttpClientProvider();
         public Gson getGSon();
 

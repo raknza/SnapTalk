@@ -1,27 +1,25 @@
 package com.example.snapchat.task;
 
 import android.content.Context;
-import android.os.Bundle;
-import com.example.snapchat.api.LoginAPI;
+import com.example.snapchat.api.MessageAPI;
 import com.example.snapchat.data.response.EmptyResponse;
 import com.example.snapchat.provider.DefaultModule;
 import dagger.hilt.android.EntryPointAccessors;
 
-public class UpdateProfileTask extends Task<EmptyResponse> {
-    private Bundle parameters;
-    private LoginAPI loginAPI;
+public class ReceivedAllMessageTask extends Task<EmptyResponse>{
 
-    public UpdateProfileTask(Context context, Bundle parameters) {
+    private MessageAPI messageAPI;
+
+    public ReceivedAllMessageTask(Context context) {
         super();
-        this.parameters = parameters;
-        loginAPI = EntryPointAccessors.fromApplication(
-                context, DefaultModule.ProviderEntryPoint.class).getLoginAPI();
+        messageAPI = EntryPointAccessors.fromApplication(
+                context, DefaultModule.ProviderEntryPoint.class).getMessagePI();
     }
 
     @Override
     protected EmptyResponse doInBackground(Void... voids) {
         try {
-            return loginAPI.updateUserInfo(parameters);
+            return messageAPI.receivedMessage();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -32,5 +30,4 @@ public class UpdateProfileTask extends Task<EmptyResponse> {
     public void onException(Exception e){
 
     }
-
 }

@@ -24,7 +24,7 @@ import retrofit2.http.Path;
 public interface ContactService {
 
     /**
-     * A Provider implementation for LoginService.
+     * A Provider implementation for ContactService.
      */
     @Module
     @InstallIn(SingletonComponent.class)

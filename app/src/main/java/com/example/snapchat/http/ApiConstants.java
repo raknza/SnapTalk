@@ -17,6 +17,8 @@ public class ApiConstants {
     public static final String URL_DELETE_CONTACT = "/api/contact/delete";
     public static final String URL_LOGIN = "api/user/login";
     public static final String URL_REGISTRATION = "/api/user/registration";
+    public static final String URL_GET_UNRECEIVED_MESSAGE = "/api/message";
+    public static final String URL_RECEIVED_MESSAGE = "/api/message/receivedall";
 
 
 }
