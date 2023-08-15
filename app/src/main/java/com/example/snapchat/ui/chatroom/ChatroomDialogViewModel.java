@@ -42,7 +42,7 @@ public class ChatroomDialogViewModel extends ViewModel {
 
     public void setChatPartner(ChatPartner partner){
         chatPartner.setValue(partner);
-        sendTopic = DataManager.getInstance().getUserLiveData().getValue().username + "." + partner.contact.username;
+        sendTopic = "message/" + DataManager.getInstance().getUserLiveData().getValue().username + "/" + partner.contact.username;
         messageList = DataManager.getInstance().getMessagesWithPartner(partner.contact.id).getValue();
         messageAdapter.setValue(new MessageAdapter(messageList));
         messageAdapter.getValue().setPartner(partner);

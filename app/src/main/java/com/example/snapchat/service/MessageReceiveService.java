@@ -99,7 +99,7 @@ public class MessageReceiveService extends Service implements IMqttCallBack {
             mqttClientProvider.subscribe(DataManager.getInstance().getUserLiveData().getValue().username);
             DataManager.getInstance().getContactListLiveData().observeForever( list -> {
                 for(Contact contact:list){
-                    mqttClientProvider.subscribe(contact.username + "." + DataManager.getInstance().getUserLiveData().getValue().username);
+                    mqttClientProvider.subscribe("message/" + contact.username + "/" + DataManager.getInstance().getUserLiveData().getValue().username);
                 }
             });
         }
@@ -127,7 +127,6 @@ public class MessageReceiveService extends Service implements IMqttCallBack {
 
     @Override
     public void messageArrived(String topic, MqttMessage message) {
-
         String jsonMessage = new String(message.getPayload());
         try {
             Message receivedMessage = gson.fromJson(jsonMessage, Message.class);
@@ -145,10 +144,11 @@ public class MessageReceiveService extends Service implements IMqttCallBack {
 
     private void showNotification(String topic, String message) {
         StringBuilder stringBuilder = new StringBuilder();
-        for(int i=0;topic.charAt(i) != '.';i++){
+        for(int i=topic.indexOf('/')+1;topic.charAt(i) != '/';i++){
             stringBuilder.append(topic.charAt(i));
         }
-        stringBuilder.append(" ").append(message);
+        String partner = stringBuilder.toString();
+        stringBuilder.append(" ").append(message);;
         NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), "channel_id")
                 .setSmallIcon(R.mipmap.snap)
@@ -161,7 +161,7 @@ public class MessageReceiveService extends Service implements IMqttCallBack {
         }
 
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-        intent.putExtra("openChatroom", topic.substring(0,topic.indexOf('.')));
+        intent.putExtra("openChatroom", partner);
         PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         builder.setContentIntent(pendingIntent);
         builder.setAutoCancel(true);
