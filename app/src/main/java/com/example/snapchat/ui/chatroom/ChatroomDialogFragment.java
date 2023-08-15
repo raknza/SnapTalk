@@ -35,6 +35,9 @@ public class ChatroomDialogFragment extends DialogFragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+
+        getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         ChatroomDialogViewModel chatroomViewModel =
                 new ViewModelProvider(this).get(ChatroomDialogViewModel.class);
 
@@ -53,12 +56,11 @@ public class ChatroomDialogFragment extends DialogFragment {
             }
         });
         chatroomViewModel.setChatPartner(partner);
+        binding.recyclerView.scrollToPosition(chatroomViewModel.getMessageAdapter().getValue().getItemCount()-1);
         Glide.with(binding.avatar.getContext())
                 .load(partner.contact.avatar.isEmpty()? R.drawable.avatar_icon:partner.contact.avatar)
                 .apply(RequestOptions.circleCropTransform())
                 .into(binding.avatar);
-        getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 
         chatroomViewModel.setGson(EntryPointAccessors.fromApplication(getContext(), DefaultModule.ProviderEntryPoint.class).getGSon());
 

@@ -8,6 +8,7 @@ import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.snapchat.data.MessageDataSource;
 import com.example.snapchat.data.model.ChatPartner;
 import com.example.snapchat.data.model.Contact;
 import com.example.snapchat.data.model.Message;
@@ -28,7 +29,8 @@ public class DataManager {
     private MutableLiveData<List<Contact>> contactListLiveData = new MutableLiveData<>();
 
     private MutableLiveData<List<ChatPartner>> chatPartners = new MutableLiveData<>();
-    private Map<Integer, MutableLiveData<List<Message>>> messagesWithSender = new HashMap<>();
+    private Map<Integer, MutableLiveData<List<Message>>> messagesWithSender;
+    MessageDataSource messageDataSource;
     private DataManager() {
     }
 
@@ -41,17 +43,6 @@ public class DataManager {
 
     @SuppressLint("StaticFieldLeak")
     public void fetchData(Context context){
-        GetUserInfoTask getUserInfoTask = new GetUserInfoTask(context) {
-            @Override
-            protected void onPostExecute(User result){
-                super.onPostExecute(result);
-                if(result != null) {
-                    userLiveData.setValue(result);
-                }
-            }
-        };
-        getUserInfoTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-
         GetContactTask getContactTask = new GetContactTask(context) {
             @Override
             protected void onPostExecute(Contact[] result){
@@ -75,7 +66,22 @@ public class DataManager {
                 }
             }
         };
-        getContactTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        GetUserInfoTask getUserInfoTask = new GetUserInfoTask(context) {
+            @Override
+            protected void onPostExecute(User result){
+                super.onPostExecute(result);
+                if(result != null) {
+                    userLiveData.setValue(result);
+                    messageDataSource = new MessageDataSource(context);
+                    messageDataSource.open();
+                    messagesWithSender = messageDataSource.getMessagesWithSender();
+                    getContactTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                }
+            }
+        };
+        getUserInfoTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+
     }
 
     public MutableLiveData<User> getUserLiveData() {
@@ -126,6 +132,14 @@ public class DataManager {
             currentMessages.add(message);
             senderMessages.postValue(currentMessages);
         }
+
+        for(ChatPartner partner: chatPartners.getValue()){
+            if(partner.contact.id == message.senderId){
+                partner.lastMessage = message;
+                break;
+            }
+        }
+        messageDataSource.insertMessage(message);
     }
 
 
@@ -150,6 +164,14 @@ public class DataManager {
 
         currentMessages.add(message);
         senderMessages.setValue(currentMessages);
+
+        for(ChatPartner partner: chatPartners.getValue()){
+            if(partner.contact.id == message.recipientId){
+                partner.lastMessage = message;
+                break;
+            }
+        }
+        messageDataSource.insertMessage(message);
     }
 
 }
