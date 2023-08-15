@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity  {
         setSupportActionBar(binding.appBarMain.toolbar);
         DrawerLayout drawer = binding.drawerLayout;
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_contact, R.id.nav_slideshow)
+                R.id.nav_home, R.id.nav_contact, R.id.nav_profile)
                 .setOpenableLayout(drawer)
                 .build();
         init();

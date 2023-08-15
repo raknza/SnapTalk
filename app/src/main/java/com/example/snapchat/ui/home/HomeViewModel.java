@@ -9,6 +9,7 @@ import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModel;
 
 import com.example.snapchat.adapter.ChatroomAdapter;
@@ -39,7 +40,13 @@ public class HomeViewModel extends ViewModel {
         DataManager.getInstance().getChatPartners().observe(owner, chatPartners -> {
             this.chatPartners = chatPartners;
             chatroomAdapter.setValue(new ChatroomAdapter(chatPartners, this));
+            for(ChatPartner partner:chatPartners){
+                observeLastMessage(owner,partner);
+            }
         });
+    }
+    private void observeLastMessage(LifecycleOwner owner, ChatPartner chatPartner) {
+        chatPartner.lastMessage.observe(owner, message -> chatroomAdapter.getValue().updateData());
     }
 
     public void selectChatPartner(int index){

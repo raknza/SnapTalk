@@ -30,6 +30,10 @@ public class ChatroomAdapter extends RecyclerView.Adapter<ChatroomAdapter.ChatPa
         notifyDataSetChanged();
     }
 
+    @SuppressLint("NotifyDataSetChanged")
+    public void updateData() {
+        notifyDataSetChanged();
+    }
     @NonNull
     @Override
     public ChatPartnerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

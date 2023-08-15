@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 
 import com.example.snapchat.data.model.User;
 import com.example.snapchat.data.response.AuthResponse;
+import com.example.snapchat.data.response.EmptyResponse;
 import com.example.snapchat.data.response.LoginResponse;
 import com.example.snapchat.data.response.SignupResponse;
 import com.example.snapchat.http.ApiConstants;
@@ -60,7 +61,7 @@ public interface LoginService {
     @NonNull
     @FormUrlEncoded
     @PUT(ApiConstants.URL_USER_INFO_UPDATE)
-    Call<ResponseBody> updateUserInfo(@FieldMap Map<String, String> parameters);
+    Call<EmptyResponse> updateUserInfo(@FieldMap Map<String, String> parameters);
 
     @NonNull
     @FormUrlEncoded

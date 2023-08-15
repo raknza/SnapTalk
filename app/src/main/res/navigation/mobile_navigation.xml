@@ -18,8 +18,8 @@
         tools:layout="@layout/fragment_contact" />
 
     <fragment
-        android:id="@+id/nav_slideshow"
-        android:name="com.example.snapchat.ui.slideshow.SlideshowFragment"
+        android:id="@+id/nav_profile"
+        android:name="com.example.snapchat.ui.profile.ProfileFragment"
         android:label="@string/menu_profile"
-        tools:layout="@layout/fragment_slideshow" />
+        tools:layout="@layout/fragment_profile" />
 </navigation>

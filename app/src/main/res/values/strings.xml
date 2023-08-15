@@ -38,4 +38,10 @@
     <string name="signup_failed">"Username has been used."</string>
     <string name="delete_contact">刪除好友</string>
     <string name="important_contact">重要好友</string>
+    <string name="profile_avatar_hint">YOUR AVATAR URL</string>
+    <string name="profile_name_hint">YOUR NAME</string>
+    <string name="profile_email_hint">YOUR EMAIL</string>
+    <string name="profile_profile_hint">YOUR PROFILE</string>
+    <string name="profile_modify_success">修改成功！</string>
+    <string name="profile_modify_fail">修改失敗！</string>
 </resources>

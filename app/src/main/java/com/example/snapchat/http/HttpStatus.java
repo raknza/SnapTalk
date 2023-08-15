@@ -1,4 +1,4 @@
-package com.example.snapchat.utils;
+package com.example.snapchat.http;
 
 public class HttpStatus {
     // Make this class non-instantiable

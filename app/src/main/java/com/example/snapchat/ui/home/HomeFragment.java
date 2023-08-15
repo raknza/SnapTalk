@@ -31,13 +31,12 @@ public class HomeFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        viewModel =
-                new ViewModelProvider(this).get(HomeViewModel.class);
+        viewModel = new ViewModelProvider(this).get(HomeViewModel.class);
 
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
         binding.setViewModel(viewModel);
-        binding.setLifecycleOwner(this);
+        binding.setLifecycleOwner(getViewLifecycleOwner());
         viewModel.observeChatPartners(this);
 
         viewModel.getOnSelectedCharPartners().observe( getViewLifecycleOwner(), chatPartner -> {
@@ -60,6 +59,7 @@ public class HomeFragment extends Fragment {
         Bundle args = getArguments();
         if (args != null && args.containsKey("openChatroom")) {
             openDialogWithUsername(args.getString("openChatroom"));
+            args.clear();
         }
     }
 

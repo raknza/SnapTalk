@@ -17,4 +17,14 @@ public class User {
     public String avatar;
     @SerializedName("email")
     public String email;
+
+    public User(User user){
+        this.id = user.id;
+        this.username = user.username;
+        this.password = user.password;
+        this.name = user.name;
+        this.profile = user.profile;
+        this.avatar = user.avatar;
+        this.email = user.email;
+    }
 }

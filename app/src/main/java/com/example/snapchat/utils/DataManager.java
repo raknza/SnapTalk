@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -57,7 +58,7 @@ public class DataManager {
                         MutableLiveData<List<Message>> messages = messagesWithSender.get(contact.id);
                         if( messages != null && messages.getValue() != null){
                             if( messages.getValue().size() != 0){
-                                partner.lastMessage = messages.getValue().get(messages.getValue().size()-1);
+                                partner.lastMessage.setValue(messages.getValue().get(messages.getValue().size()-1));
                             }
                         }
                         partners.add(partner);
@@ -135,7 +136,7 @@ public class DataManager {
 
         for(ChatPartner partner: chatPartners.getValue()){
             if(partner.contact.id == message.senderId){
-                partner.lastMessage = message;
+                partner.lastMessage.postValue(message);
                 break;
             }
         }
@@ -167,7 +168,7 @@ public class DataManager {
 
         for(ChatPartner partner: chatPartners.getValue()){
             if(partner.contact.id == message.recipientId){
-                partner.lastMessage = message;
+                partner.lastMessage.setValue(message);
                 break;
             }
         }

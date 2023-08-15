@@ -13,7 +13,7 @@
             android:icon="@drawable/group"
             android:title="@string/menu_friend" />
         <item
-            android:id="@+id/nav_slideshow"
+            android:id="@+id/nav_profile"
             android:icon="@drawable/auser"
             android:title="@string/menu_profile" />
     </group>
