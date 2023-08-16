@@ -27,6 +27,7 @@ public class ChatroomDialogViewModel extends ViewModel {
     private MqttClientProvider mqttClientProvider ;
     private String sendTopic;
     Gson gson;
+    SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy HH:mm:ss", Locale.TAIWAN);
 
     public LiveData<List<Message>> getMessagesWithSender() {
         return DataManager.getInstance().getMessagesWithPartner(chatPartner.getValue().contact.id);
@@ -42,7 +43,7 @@ public class ChatroomDialogViewModel extends ViewModel {
 
     public void setChatPartner(ChatPartner partner){
         chatPartner.setValue(partner);
-        sendTopic = "message/" + DataManager.getInstance().getUserLiveData().getValue().username + "/" + partner.contact.username;
+        sendTopic = "message/" + partner.contact.username + "/"  + DataManager.getInstance().getUserLiveData().getValue().username ;
         messageList = DataManager.getInstance().getMessagesWithPartner(partner.contact.id).getValue();
         messageAdapter.setValue(new MessageAdapter(messageList));
         messageAdapter.getValue().setPartner(partner);
@@ -61,12 +62,13 @@ public class ChatroomDialogViewModel extends ViewModel {
     }
 
     public void sendMessage(){
+        if(textMessage.getValue().equals(""))
+            return;
         Message message = new Message();
         message.content = textMessage.getValue();
         message.messageType = Message.MessageType.TEXT;
         message.senderId = DataManager.getInstance().getUserLiveData().getValue().id;
         message.recipientId = chatPartner.getValue().contact.id;
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy HH:mm:ss", Locale.TAIWAN);
         message.timestamp = dateFormat.format(new Date());
         textMessage.setValue("");
         sendMessage(message);

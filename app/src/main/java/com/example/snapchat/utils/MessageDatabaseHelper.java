@@ -23,7 +23,7 @@ public class MessageDatabaseHelper extends SQLiteOpenHelper {
             + COLUMN_SENDER_ID + " INTEGER,"
             + COLUMN_RECIPIENT_ID + " INTEGER,"
             + COLUMN_CONTENT + " TEXT,"
-            + COLUMN_MESSAGE_TYPE + " TEXT,"
+            + COLUMN_MESSAGE_TYPE + " INTEGER,"
             + COLUMN_TIMESTAMP + " TEXT,"
             + COLUMN_IS_READ + " INTEGER,"
             + COLUMN_IS_RECEIVED + " INTEGER"

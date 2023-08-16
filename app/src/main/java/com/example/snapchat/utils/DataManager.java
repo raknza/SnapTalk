@@ -3,25 +3,23 @@ package com.example.snapchat.utils;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
-import android.widget.Toast;
-
+import android.util.Pair;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-
 import com.example.snapchat.data.MessageDataSource;
 import com.example.snapchat.data.model.ChatPartner;
 import com.example.snapchat.data.model.Contact;
 import com.example.snapchat.data.model.Message;
 import com.example.snapchat.data.model.User;
 import com.example.snapchat.task.GetContactTask;
+import com.example.snapchat.task.GetUnreceivedMessageTask;
 import com.example.snapchat.task.GetUserInfoTask;
-
+import com.example.snapchat.task.ReceivedAllMessageTask;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 
 public class DataManager {
     private static DataManager instance;
@@ -31,9 +29,9 @@ public class DataManager {
 
     private MutableLiveData<List<ChatPartner>> chatPartners = new MutableLiveData<>();
     private Map<Integer, MutableLiveData<List<Message>>> messagesWithSender;
+    private MutableLiveData<Pair<String,Message>> lastUnreceivedMessage = new MutableLiveData<>();
     MessageDataSource messageDataSource;
-    private DataManager() {
-    }
+    private DataManager() {}
 
     public static DataManager getInstance() {
         if (instance == null) {
@@ -44,6 +42,32 @@ public class DataManager {
 
     @SuppressLint("StaticFieldLeak")
     public void fetchData(Context context){
+        ReceivedAllMessageTask receivedAllMessageTask = new ReceivedAllMessageTask(context){};
+        GetUnreceivedMessageTask getUnreceivedMessageTask = new GetUnreceivedMessageTask(context){
+            @Override
+            protected void onPostExecute(List<Message> result){
+                if(result != null && result.size() > 0){
+                    for(Message message:result){
+                        if(message.senderId == userLiveData.getValue().id){
+                            addMessageForSender(message);
+                        }
+                        else{
+                            addMessageForSender(message.senderId,message);
+                        }
+                    }
+                    Message lastMessage = result.get(result.size() - 1);
+                    List<ChatPartner> partners = chatPartners.getValue();
+                    for(int i=0;i<partners.size();i++){
+                        if(partners.get(i).contact.id == lastMessage.senderId){
+                            lastUnreceivedMessage.setValue(new Pair(partners.get(i).contact.username,lastMessage));
+                            break;
+                        }
+                    }
+                    receivedAllMessageTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                    clearUnreceivedMessage();
+                }
+            }
+        };
         GetContactTask getContactTask = new GetContactTask(context) {
             @Override
             protected void onPostExecute(Contact[] result){
@@ -64,6 +88,7 @@ public class DataManager {
                         partners.add(partner);
                     }
                     chatPartners.setValue(partners);
+                    getUnreceivedMessageTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                 }
             }
         };
@@ -82,7 +107,6 @@ public class DataManager {
         };
         getUserInfoTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
-
     }
 
     public MutableLiveData<User> getUserLiveData() {
@@ -94,6 +118,9 @@ public class DataManager {
     }
 
     public MutableLiveData<List<ChatPartner>> getChatPartners() { return chatPartners; }
+
+    public MutableLiveData<Pair<String,Message>> getLastUnreceivedMessage() {return lastUnreceivedMessage;}
+    public void clearUnreceivedMessage() { lastUnreceivedMessage.setValue(null);}
 
     public void updateUser(User user) {
         userLiveData.postValue(user);

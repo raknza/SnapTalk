@@ -9,25 +9,16 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.example.myapplication.R;
 import com.example.myapplication.databinding.NavHeaderMainBinding;
-import com.example.snapchat.data.model.ChatPartner;
-import com.example.snapchat.provider.DefaultModule;
 import com.example.snapchat.service.MessageReceiveService;
 import com.example.snapchat.ui.authentication.LoginActivity;
-import com.example.snapchat.ui.home.HomeFragment;
 import com.example.snapchat.utils.DataManager;
-import com.example.snapchat.utils.JwtInterceptor;
 import com.example.snapchat.utils.JwtManager;
 import com.google.android.material.navigation.NavigationView;
-
 import androidx.databinding.DataBindingUtil;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -37,7 +28,6 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.myapplication.databinding.ActivityMainBinding;
 import dagger.hilt.android.AndroidEntryPoint;
-import dagger.hilt.android.EntryPointAccessors;
 
 @AndroidEntryPoint
 public class MainActivity extends AppCompatActivity  {
@@ -47,6 +37,7 @@ public class MainActivity extends AppCompatActivity  {
     private NavHeaderMainBinding navBinding;
     MainViewModel mainViewModel;
     NavController navController;
+    boolean init = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,13 +50,13 @@ public class MainActivity extends AppCompatActivity  {
                 R.id.nav_home, R.id.nav_contact, R.id.nav_profile)
                 .setOpenableLayout(drawer)
                 .build();
-        init();
         if(isServiceRunning(MessageReceiveService.class) == false) {
             Intent serviceIntent = new Intent(this, MessageReceiveService.class);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 startForegroundService(serviceIntent);
             }
         }
+        init();
 
     }
 
@@ -90,6 +81,7 @@ public class MainActivity extends AppCompatActivity  {
     }
 
     private void logout(){
+        init = false;
         JwtManager.removeJwt(getApplicationContext());
         Intent intent = new Intent(MainActivity.this, LoginActivity.class);
         startActivity(intent);
@@ -97,11 +89,11 @@ public class MainActivity extends AppCompatActivity  {
     }
 
     private void init(){
-        addJwtInterceptor();
-        checkAuth();
+        JwtManager.addJwtInterceptor(getApplicationContext());
         DataManager.getInstance().fetchData(getApplicationContext());
         DataManager.getInstance().getUserLiveData().observe(this, user ->{
             if(user!= null) {
+                init = true;
                 navBinding();
             }
         });
@@ -145,28 +137,25 @@ public class MainActivity extends AppCompatActivity  {
         }
     }
 
-    private void addJwtInterceptor(){
-        // add jwt for each request
-        JwtInterceptor jwtInterceptor = (JwtInterceptor) EntryPointAccessors.fromApplication(
-                        getApplicationContext(), DefaultModule.ProviderEntryPoint.class).getOkHttpClientProvider()
-                .get().interceptors().get(0);
-        jwtInterceptor.setToken(JwtManager.getJwtFromSharedPreferences(getApplicationContext()));
-    }
-
     private void checkAuth(){
         // check if auth valid, logout when auth is invalid
         mainViewModel.getIsAuthValid().observe(this, auth -> {
             if(auth == false){
+                Log.e("checkAuth","without check and logout");
                 logout();
             }
         });
+        Log.e("checkAuth","check auth");
         mainViewModel.checkAuth(getApplicationContext());
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        checkAuth();
+        if(init == true) {
+            Log.e("checkAuth","resume check");
+            checkAuth();
+        }
     }
 
     private boolean isServiceRunning(Class<?> serviceClass) {

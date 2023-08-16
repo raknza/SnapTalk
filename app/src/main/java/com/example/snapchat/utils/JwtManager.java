@@ -2,7 +2,12 @@ package com.example.snapchat.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+
+import com.example.snapchat.provider.DefaultModule;
+
 import java.lang.ref.WeakReference;
+
+import dagger.hilt.android.EntryPointAccessors;
 
 public class JwtManager {
 
@@ -26,5 +31,13 @@ public class JwtManager {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.remove("jwt");
         editor.apply();
+    }
+
+    public static void addJwtInterceptor(Context context){
+        // add jwt for each request
+        JwtInterceptor jwtInterceptor = (JwtInterceptor) EntryPointAccessors.fromApplication(context
+                        , DefaultModule.ProviderEntryPoint.class).getOkHttpClientProvider()
+                .get().interceptors().get(0);
+        jwtInterceptor.setToken(getJwtFromSharedPreferences(context));
     }
 }

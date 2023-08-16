@@ -7,8 +7,14 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkRequest;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.util.Log;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
@@ -19,13 +25,13 @@ import com.example.snapchat.data.model.Message;
 import com.example.snapchat.provider.DefaultModule;
 import com.example.snapchat.provider.MqttClientProvider;
 import com.example.snapchat.utils.DataManager;
-import com.example.snapchat.data.model.Contact;
+import com.example.snapchat.utils.JwtManager;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
-import org.eclipse.paho.client.mqttv3.IMqttToken;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
+import java.nio.charset.StandardCharsets;
 import dagger.hilt.android.EntryPointAccessors;
 
 
@@ -35,6 +41,8 @@ public class MessageReceiveService extends Service implements IMqttCallBack {
     private static final int NOTIFICATION_ID = 123;
     MqttClientProvider mqttClientProvider;
     Gson gson;
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
+    private ConnectivityManager.NetworkCallback networkCallback;
 
     @Override
     public void onCreate() {
@@ -51,12 +59,32 @@ public class MessageReceiveService extends Service implements IMqttCallBack {
                 .setSmallIcon(R.drawable.snap_2)
                 .setPriority(NotificationCompat.PRIORITY_LOW);
         Notification notification = notificationBuilder.build();
-
         startForeground(NOTIFICATION_ID, notification);
-
-        DataManager.getInstance().getUserLiveData().observeForever(user-> {
-            connect();
-        });
+        // listen network status
+        networkCallback = new ConnectivityManager.NetworkCallback() {
+            @Override
+            public void onAvailable(Network network) {
+                super.onAvailable(network);
+                ConnectivityManager connectivityManager = null;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                    connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+                }
+                NetworkCapabilities networkCapabilities = connectivityManager.getNetworkCapabilities(network);
+                if (networkCapabilities != null && networkCapabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
+                    mainHandler.post(() -> {
+                        JwtManager.addJwtInterceptor(getApplicationContext());
+                        DataManager.getInstance().fetchData(getApplicationContext());
+                        DataManager.getInstance().getUserLiveData().observeForever(user-> {
+                            if(user != null)
+                                connect();
+                        });
+                    });
+                }
+            }
+        };
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkRequest networkRequest = new NetworkRequest.Builder().build();
+        connectivityManager.registerNetworkCallback(networkRequest, networkCallback);
         return START_REDELIVER_INTENT;
     }
 
@@ -75,6 +103,8 @@ public class MessageReceiveService extends Service implements IMqttCallBack {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        connectivityManager.unregisterNetworkCallback(networkCallback);
         stopForeground(true);
     }
 
@@ -98,26 +128,14 @@ public class MessageReceiveService extends Service implements IMqttCallBack {
             // subscribe user relations topic
             mqttClientProvider.subscribe(DataManager.getInstance().getUserLiveData().getValue().username);
             DataManager.getInstance().getContactListLiveData().observeForever( list -> {
-                for(Contact contact:list){
-                    mqttClientProvider.subscribe("message/" + contact.username + "/" + DataManager.getInstance().getUserLiveData().getValue().username);
+                mqttClientProvider.subscribe("message/" + DataManager.getInstance().getUserLiveData().getValue().username + "/#");
+            });
+            DataManager.getInstance().getLastUnreceivedMessage().observeForever( lastMassage ->{
+                if(lastMassage != null) {
+                    showNotification(lastMassage.first, lastMassage.second.content);
                 }
             });
         }
-    }
-
-    @Override
-    public void onActionSuccess(int action, IMqttToken asyncActionToken) {
-
-    }
-
-    @Override
-    public void onActionFailure(int action, IMqttToken asyncActionToken, Throwable exception) {
-
-    }
-
-    @Override
-    public void onActionFailure(int action, Exception e) {
-
     }
 
     @Override
@@ -132,6 +150,7 @@ public class MessageReceiveService extends Service implements IMqttCallBack {
             Message receivedMessage = gson.fromJson(jsonMessage, Message.class);
             DataManager.getInstance().addMessageForSender(receivedMessage.senderId, receivedMessage);
             showNotification(topic,receivedMessage.content);
+            mqttClientProvider.sendData(DataManager.getInstance().getUserLiveData().getValue().username.getBytes(StandardCharsets.UTF_8),"message/received");
         } catch (JsonSyntaxException e) {
             Log.e("JSON Parse Error", "Error parsing JSON: " + jsonMessage, e);
         }
@@ -144,7 +163,7 @@ public class MessageReceiveService extends Service implements IMqttCallBack {
 
     private void showNotification(String topic, String message) {
         StringBuilder stringBuilder = new StringBuilder();
-        for(int i=topic.indexOf('/')+1;topic.charAt(i) != '/';i++){
+        for(int i=topic.lastIndexOf('/')+1;i<topic.length();i++){
             stringBuilder.append(topic.charAt(i));
         }
         String partner = stringBuilder.toString();

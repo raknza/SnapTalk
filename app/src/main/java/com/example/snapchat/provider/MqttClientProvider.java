@@ -1,26 +1,25 @@
 package com.example.snapchat.provider;
 
 import androidx.annotation.NonNull;
-
+import org.eclipse.paho.client.mqttv3.IMqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
-import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import com.example.snapchat.data.IMqttCallBack;
 
-public class MqttClientProvider {
+public class MqttClientProvider implements MqttCallback {
 
-    private MqttClient client;
+    private IMqttAsyncClient client;
     private MqttConnectOptions mqttConnectOptions;
     private static MqttClientProvider instance;
     private IMqttCallBack iMqttCallBack;
     public static int ACTION_CONNECT = 301;
     public static int ACTION_SUBSCRIBE = 401;
     public static int ACTION_PUBLISH = 501;
-    private MqttCallback mCallBack;
     public static MqttClientProvider getInstance() {
         if (instance == null) {
             synchronized (MqttClientProvider.class) {
@@ -40,32 +39,7 @@ public class MqttClientProvider {
         mqttConnectOptions.setKeepAliveInterval(300);
         mqttConnectOptions.setUserName("a".trim());
         mqttConnectOptions.setPassword("a".trim().toCharArray());
-        mqttConnectOptions.setConnectionTimeout(100);
-        mqttConnectOptions.setAutomaticReconnect(true);
-        mCallBack = new MqttCallback() {
-            @Override
-            public void connectionLost(Throwable cause) {
-                if (iMqttCallBack != null) {
-                    iMqttCallBack.connectionLost(cause);
-                }
-            }
-
-            @Override
-            public void messageArrived(String topic, MqttMessage message) {
-                if (iMqttCallBack != null) {
-                    iMqttCallBack.messageArrived(topic, message);
-                }
-            }
-
-            @Override
-            public void deliveryComplete(IMqttDeliveryToken token) {
-                if (iMqttCallBack != null) {
-                    iMqttCallBack.deliveryComplete(token);
-                }
-
-            }
-        };
-
+        mqttConnectOptions.setConnectionTimeout(30);
     }
 
     public void setIMqttCallBack(IMqttCallBack callBack) {
@@ -80,16 +54,13 @@ public class MqttClientProvider {
         mqttConnectOptions.setPassword(password.trim().toCharArray());
         MemoryPersistence persistence = new MemoryPersistence();
         if (client == null) {
-            client = new MqttClient(getBaseUrl(),username,persistence);
+            client = new MqttAsyncClient(getBaseUrl(),username,persistence);
         }
         try {
+            client.setCallback(this);
             client.connect(mqttConnectOptions);
-            client.setCallback(mCallBack);
 
         } catch (MqttException e) {
-            if (iMqttCallBack != null) {
-                iMqttCallBack.onActionFailure(ACTION_CONNECT, e);
-            }
             e.printStackTrace();
         }
     }
@@ -100,9 +71,6 @@ public class MqttClientProvider {
         try {
             client.publish(topic, mqttMessage);
         } catch (Exception e) {
-            if (iMqttCallBack != null) {
-                iMqttCallBack.onActionFailure(ACTION_PUBLISH, e);
-            }
             e.printStackTrace();
         }
     }
@@ -118,21 +86,13 @@ public class MqttClientProvider {
             e.printStackTrace();
         }
         try {
-            client.subscribe(topic);
-
+            client.subscribe(topic,0);
         } catch (MqttException e) {
-            if (iMqttCallBack != null) {
-                iMqttCallBack.onActionFailure(ACTION_SUBSCRIBE, e);
-            }
             e.printStackTrace();
         }
     }
     public boolean isConnected() {
         return client != null && client.isConnected();
-    }
-
-    public MqttClient getClient() {
-        return client;
     }
 
     public void release() throws MqttException {
@@ -143,6 +103,28 @@ public class MqttClientProvider {
         iMqttCallBack = null;
     }
 
+    @Override
+    public void connectionLost(Throwable cause) {
+        if (iMqttCallBack != null) {
+            iMqttCallBack.connectionLost(cause);
+        }
+
+    }
+
+    @Override
+    public void messageArrived(String topic, MqttMessage message) {
+        if (iMqttCallBack != null) {
+            iMqttCallBack.messageArrived(topic, message);
+        }
+    }
+
+    @Override
+    public void deliveryComplete(IMqttDeliveryToken token) {
+        if (iMqttCallBack != null) {
+            iMqttCallBack.deliveryComplete(token);
+        }
+
+    }
     @NonNull
     private String getBaseUrl() {
         return "tcp://192.168.1.159:1883";

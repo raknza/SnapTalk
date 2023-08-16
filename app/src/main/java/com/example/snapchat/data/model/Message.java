@@ -27,9 +27,13 @@ public class Message {
     @SerializedName("isReceived")
     public boolean isReceived;
     public enum MessageType {
+        @SerializedName("0")
         TEXT,
+        @SerializedName("1")
         IMAGE,
+        @SerializedName("2")
         FILE,
+        @SerializedName("3")
         LINK
     }
 
@@ -40,10 +44,10 @@ public class Message {
     static String outputFormat = "HH:mm";
     public static String convertDateFormat(String inputDate) {
         try {
-            SimpleDateFormat inputDateFormat = new SimpleDateFormat(inputFormat, Locale.getDefault());
+            SimpleDateFormat inputDateFormat = new SimpleDateFormat(inputFormat, Locale.TAIWAN);
             Date date = inputDateFormat.parse(inputDate);
 
-            SimpleDateFormat outputDateFormat = new SimpleDateFormat(outputFormat, Locale.getDefault());
+            SimpleDateFormat outputDateFormat = new SimpleDateFormat(outputFormat, Locale.TAIWAN);
             return outputDateFormat.format(date);
         } catch (ParseException e) {
             e.printStackTrace();
